@@ -17,7 +17,7 @@ class Scanner(val source: String) {
 
     private var column = 0
 
-    fun error(message: String) : RuntimeException = RuntimeException("Unexpected error at line $line, column $column: $message")
+    fun error(message: String) : TomlJvmException = TomlJvmException("Unexpected error at line $line, column $column: $message")
 
     private fun isAtEnd(): Boolean {
         return current >= source.length
@@ -50,6 +50,12 @@ class Scanner(val source: String) {
         return source[current]
     }
 
+
+    private fun prev() : Char {
+        if (isAtEnd()) return UNICODE_END
+        return source[current - 1]
+    }
+
     fun scan() : List<Token> {
         while (!isAtEnd()) {
             start = current
@@ -68,6 +74,8 @@ class Scanner(val source: String) {
             ',' -> addToken(TokenType.COMMA)
             '[' -> addToken(TokenType.L_SQUARE_BRACKET)
             ']' -> addToken(TokenType.R_SQUARE_BRACKET)
+            '{' -> addToken(TokenType.L_BRACKET)
+            '}' -> addToken(TokenType.R_BRACKET)
             '#' -> {
                 while (peek() != '\n' && !isAtEnd()) {
                     advance()
@@ -106,7 +114,7 @@ class Scanner(val source: String) {
                 if (c.isJavaIdentifierStart() && !isAtEnd()) {
                     advance()
 
-                    while (peek().isJavaIdentifierPart() && !isAtEnd()) {
+                    while ((peek().isJavaIdentifierPart() || peek() == '-') && !isAtEnd()) {
                         advance()
                     }
 
@@ -118,14 +126,30 @@ class Scanner(val source: String) {
 
                 } else {
                     if(c == '+' || c == '-' || c.isDigit()) {
-                        advance()
 
-                        while (peek().isDigit() && !isAtEnd()) {
-                            advance()
+                        var isFloat = false
+                        while (!isAtEnd()) {
+                            if(peek().isDigit()) {
+                                advance()
+
+                            } else if(peek() == '.') {
+                                isFloat = true
+                                advance()
+
+                            } else {
+                                break
+                            }
                         }
 
+
+
                         val value = source.substring(start, current)
-                        addToken(TokenType.INTEGER, value.toInt())
+                        if(isFloat) {
+                            addToken(TokenType.FLOAT, value.toDouble())
+                        } else {
+                            addToken(TokenType.INTEGER, value.toInt())
+                        }
+
                     } else {
 
                         throw error("Unexpected character")
