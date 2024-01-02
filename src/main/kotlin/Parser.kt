@@ -16,14 +16,24 @@ class Parser(private val tokens : List<Token>) {
             if(match(TokenType.COMMENT)) {
                 statements.add(ASTNode(NodeType.COMMENT, previous()))
             }
-            statements.add(assignment())
+            statements.add(table())
         }
 
         return ASTNode(NodeType.PROGRAM, children = statements)
     }
 
+    fun table() : ASTNode {
+        if(match(TokenType.L_SQUARE_BRACKET)) {
+            val table = consume(TokenType.IDENTIFIER, "Except table name")
+            consume(TokenType.R_SQUARE_BRACKET, "Except closing square bracket")
+
+            return ASTNode(NodeType.TABLE, table)
+        }
+        return assignment()
+    }
+
     fun assignment() : ASTNode {
-        val identifier = consume(TokenType.IDENTIFIER, "Expect variable name")
+        val identifier = consume(TokenType.IDENTIFIER, "Expect entry name")
         consume(TokenType.EQUAL, "Expect equal")
 
         val value = array()

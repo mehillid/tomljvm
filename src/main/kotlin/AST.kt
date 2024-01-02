@@ -4,6 +4,8 @@ enum class NodeType {
 
     PROGRAM,
 
+    TABLE,
+
     ASSIGNMENT,
 
     ARRAY,

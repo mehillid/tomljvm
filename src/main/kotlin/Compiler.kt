@@ -1,9 +1,15 @@
 package com.github.unldenis.tomljvm
 
-class Compiler<T>(clazz: Class<T>) : ASTVisitor<Unit> {
+class Compiler<T>(parentClass: Class<T>) : ASTVisitor<Unit> {
 
-    val instance : T = clazz.newInstance()
-    private val fields = clazz.declaredFields.associateBy({it.name}, {it})
+    private var clazz: Class<*> = parentClass
+    val parentInstance = parentClass.newInstance()
+    private val parentFields = loadFields(clazz)
+
+    private var instance : Any = parentInstance as Any
+    private var fields = parentFields
+
+    private fun loadFields(cl: Class<*>) = cl.declaredFields.associateBy({it.name}, {it})
 
     override fun visit(node: ASTNode): Unit {
         return when(node.nodeType) {
@@ -46,7 +52,7 @@ class Compiler<T>(clazz: Class<T>) : ASTVisitor<Unit> {
                         Unit
                     }
                     NodeType.COMMENT -> {}
-
+                    NodeType.TABLE -> throw TomlJvmException("Entry value cannot be a table at $astValue")
                 }
             }
             NodeType.ARRAY -> {
@@ -61,6 +67,19 @@ class Compiler<T>(clazz: Class<T>) : ASTVisitor<Unit> {
 
             NodeType.PROGRAM -> {
                 node.children.forEach { visit(it) }
+            }
+
+            NodeType.TABLE -> {
+                val nameTable = node.tokens.first().lexeme
+                val field = parentFields[nameTable] ?: throw TomlJvmException("Table of name $nameTable not found")
+                val typeField = field.type
+
+                clazz = typeField
+                instance = clazz.newInstance()
+                fields = loadFields(clazz)
+
+                field.isAccessible = true
+                field.set(parentInstance, instance)
             }
         }
     }

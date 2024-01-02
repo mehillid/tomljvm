@@ -67,8 +67,7 @@ class Scanner(val source: String) {
     }
 
     fun scanToken() {
-        var c = advance()
-        when(c) {
+        when(val c = advance()) {
             '=' -> addToken(TokenType.EQUAL)
             '.' -> addToken(TokenType.DOT)
             ',' -> addToken(TokenType.COMMA)

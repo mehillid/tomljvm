@@ -25,6 +25,37 @@
     <sourceDirectory>src/main/kotlin</sourceDirectory>
     <testSourceDirectory>src/test/kotlin</testSourceDirectory>
     <plugins>
+      <!-- Plugin Maven Shade -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.4</version>
+        <configuration>
+          <relocations>
+            <relocation>
+              <pattern>kotlin.</pattern>
+              <shadedPattern>com.github.unldenis.tomljvm.shaded.kotlin.</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>org.jetbrains.</pattern>
+              <shadedPattern>com.github.unldenis.tomljvm.shaded.jetbrains.</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>org.intellij.</pattern>
+              <shadedPattern>com.github.unldenis.tomljvm.shaded.intellij.</shadedPattern>
+            </relocation>
+          </relocations>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-maven-plugin</artifactId>
@@ -62,6 +93,20 @@
           <mainClass>MainKt</mainClass>
         </configuration>
       </plugin>
+
+
+      <!-- For package -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <!-- Configura il nome del JAR -->
+          <finalName>${project.artifactId}-${project.version}</finalName>
+        </configuration>
+      </plugin>
+
+
     </plugins>
   </build>
 
@@ -83,6 +128,7 @@
       <artifactId>kotlin-stdlib</artifactId>
       <version>1.9.21</version>
     </dependency>
+
   </dependencies>
 
 </project>

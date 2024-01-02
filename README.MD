@@ -2,6 +2,6 @@ A TOML 0.4 parser for java and kotlin
 
 Todo
 - Array of arrays
-- Tables
+- ~~Tables~~
 - Array of objects
 - Dates
