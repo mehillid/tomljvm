@@ -9,7 +9,7 @@ class Compiler<T>(parentClass: Class<T>) : ASTVisitor<Unit> {
     private var instance : Any = parentInstance as Any
     private var fields = parentFields
 
-    private fun loadFields(cl: Class<*>) = cl.declaredFields.associateBy({it.name}, {it})
+    private fun loadFields(cl: Class<*>) = cl.declaredFields.associateBy({it.name.replace("_", "-")}, {it})
 
     override fun visit(node: ASTNode): Unit {
         return when(node.nodeType) {
