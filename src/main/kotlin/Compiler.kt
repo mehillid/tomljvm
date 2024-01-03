@@ -45,6 +45,11 @@ class Compiler<T>(parentClass: Class<T>) : ASTVisitor<Unit> {
                                             double
                                         }
                                     }
+                                    TokenType.STRING -> {
+                                        if (field.type.isEnum) {
+                                            getEnumFromString(it.type as Class<out Enum<*>>, value.literal.toString())
+                                        } else { value.literal }
+                                    }
                                     else -> { value.literal }
                                 }
                             )
@@ -83,10 +88,6 @@ class Compiler<T>(parentClass: Class<T>) : ASTVisitor<Unit> {
             }
         }
     }
-
-
-
-
 
 
 }
