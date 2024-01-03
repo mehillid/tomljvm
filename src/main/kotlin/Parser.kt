@@ -13,7 +13,7 @@ class Parser(private val tokens : List<Token>) {
     fun parse(): ASTNode {
         val statements: MutableList<ASTNode> = mutableListOf()
         while (!isAtEnd()) {
-            if(match(TokenType.COMMENT)) {
+            while(match(TokenType.COMMENT)) {
                 statements.add(ASTNode(NodeType.COMMENT, previous()))
             }
             statements.add(table())
