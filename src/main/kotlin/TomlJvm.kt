@@ -20,5 +20,9 @@ class TomlJvm  {
 
             return visitor.parentInstance
         }
+
+
+        /** Reified version of [TomlJvm.read] (Kotlin only) */
+        inline fun <reified T> read(source: String) : T = read(source, T::class.java)
     }
 }
